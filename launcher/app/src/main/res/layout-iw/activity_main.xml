@@ -180,6 +180,7 @@
                 android:gravity="right|bottom">
 
                 <LinearLayout
+                    android:id="@+id/dateBlock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
@@ -315,6 +316,13 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnRecents"
+                    style="@style/TopButton"
+                    android:text="@string/recents"
+                    android:drawableStart="@drawable/ic_recents_pill"
+                    android:nextFocusDown="@+id/grid" />
 
                 <TextView
                     android:id="@+id/btnSettings"
