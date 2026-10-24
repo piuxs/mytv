@@ -36,6 +36,8 @@ final class WallpaperPlayer {
     private final ExecutorService decoder = Executors.newSingleThreadExecutor();
     private final Random random = new Random();
     private final int width;
+    /** Personal fork: OnlineWallpaperPlayer owns the backdrop, so this local theme player stays a no-op. */
+    private final boolean online;
     /** config wallpaper_true_color: ARGB_8888 instead of RGB_565. */
     private final Bitmap.Config bitmapConfig;
     private final int height;
@@ -53,6 +55,7 @@ final class WallpaperPlayer {
 
     WallpaperPlayer(Context context, FrameLayout root, Config config) {
         this.root = root;
+        online = config.onlineWallpapers;
         files = new ArrayList<>(config.wallpapers);
         interval = config.wallpaperRotationMinutes * 60_000L;
         bitmapConfig = config.wallpaperTrueColor ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
@@ -73,10 +76,10 @@ final class WallpaperPlayer {
         image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        names = config.wallpaperCaptions && config.wallpaperEnabled && !files.isEmpty()
+        names = !online && config.wallpaperCaptions && config.wallpaperEnabled && !files.isEmpty()
                 ? WallpaperCaptions.read(files.get(0).getParentFile()) : Collections.emptyMap();
         caption = names.isEmpty() ? null : makeCaption(context, root);
-        if (config.wallpaperEnabled && !files.isEmpty()) {
+        if (!online && config.wallpaperEnabled && !files.isEmpty()) {
             root.addView(image, 0, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             showFirst();
@@ -112,6 +115,7 @@ final class WallpaperPlayer {
     }
 
     void start() {
+        if (online) return;
         active = true;
         update();
     }
@@ -127,7 +131,7 @@ final class WallpaperPlayer {
     }
 
     void update() {
-        if (!active || closed || loading || files.isEmpty()) return;
+        if (online || !active || closed || loading || files.isEmpty()) return;
         String previous = preferences.getString("image", "");
         File selected = WallpaperRotation.find(files, previous);
         long changed = preferences.getLong("changed", 0);

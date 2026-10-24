@@ -133,6 +133,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private RecyclerView grid;
     private FrameLayout root;
     private WallpaperPlayer wallpaperPlayer;
+    /** Personal fork: CozyPixels still wallpapers streamed into memory and shuffled every five minutes. */
+    private OnlineWallpaperPlayer onlineWallpaper;
     private GlassView glass;
     private View ambient;
     private TextView heroName;
@@ -164,6 +166,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean advancedEffects;
     private TextView greeting;
     private View clockBlock;
+    /** Weekday, day and month under the clock; hidden with the clock until the network time is valid. */
+    private View dateBlock;
+    /** Phone-style Recents pill, left of Inputs. */
+    private View btnRecents;
+    /** Apple-style volume card floating over any app while this Home process is alive. */
+    private VolumeHud volumeHud;
     private View btnInputs;
     /** config show_inputs_pill: false keeps the Inputs pill hidden even when the TV has inputs. */
     private boolean showInputsPill = true;
@@ -386,6 +394,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         wallpaperPlayer = new WallpaperPlayer(this, root, cfg);
         sky = findViewById(R.id.sky);
         sky.setIntensity(cfg.skyIntensity);
+        if (cfg.onlineWallpapers) onlineWallpaper = new OnlineWallpaperPlayer(this, root);
         glass = findViewById(R.id.glass);
         if (festive) glass.setAccent(festival.accentColor());
         ambient = findViewById(R.id.ambient);
@@ -411,6 +420,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (!cfg.dockTitle) hero.setVisibility(View.GONE);
         greeting = findViewById(R.id.greeting);
         clockBlock = findViewById(R.id.leftBlock);
+        dateBlock = findViewById(R.id.dateBlock);
         greetingColor = greeting.getCurrentTextColor();
         if (getResources().getBoolean(R.bool.rtl_menu_bar)) {
             // Center Hebrew greetings over the numeric time, independent of a visible AM/PM label.
@@ -577,6 +587,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
         }
 
+        btnRecents = findViewById(R.id.btnRecents);
+        btnRecents.setOnClickListener(v -> startActivity(new Intent(this, RecentsActivity.class)));
         btnInputs = findViewById(R.id.btnInputs);
         View btnSettings = findViewById(R.id.btnSettings);
         btnInputs.setOnClickListener(v -> showInputs());
@@ -613,6 +625,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // One gear: Inputs and Wi-Fi move into its dropdown. The Wi-Fi pill stays hidden but keeps its
             // label up to date, which the menu's Wi-Fi row shows.
             showInputsPill = false;
+            btnRecents.setVisibility(View.GONE);
             btnInputs.setVisibility(View.GONE);
             btnWifi.setVisibility(View.GONE);
             ((TextView) btnSettings).setText(R.string.settings);
@@ -637,6 +650,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             showSettingsMenu();
             return true;
         });
+        volumeHud = new VolumeHud(this);
+        volumeHud.start();
+        // The volume card sits at the bottom with the same margin the top pills have from the top.
+        View topBar = findViewById(R.id.topButtons);
+        topBar.post(() -> {
+            if (volumeHud == null) return;
+            int[] top = new int[2];
+            topBar.getLocationOnScreen(top);
+            volumeHud.setBottomInsetPx(top[1]);
+            volumeHud.refreshMute();
+        });
 
         // Keep focus on the top bar at its ends and at the top: Android's focus finder would otherwise
         // jump to a tile far below when there is nothing in that direction.
@@ -649,19 +673,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 focusTile(lastFocused % COLUMNS);
                 return true;
             }
-            int firstButton = btnInputs.getVisibility() == View.VISIBLE ? R.id.btnInputs : firstTopButton().getId();
+            int firstButton = firstTopButton().getId();
             int leftButton = rtlMenuBar ? R.id.btnSettings : firstButton;
             int rightButton = rtlMenuBar ? firstButton : R.id.btnSettings;
             if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return v.getId() == leftButton;
             return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
         };
+        btnRecents.setOnKeyListener(pillKeys);
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
         btnReorder.setOnKeyListener(pillKeys);
         btnLibraryTop.setOnKeyListener(pillKeys);
         if (advancedEffects) {
-            for (View button : new View[]{btnInputs, btnWifi, btnReorder, btnLibraryTop, btnSettings}) {
+            for (View button : new View[]{btnRecents, btnInputs, btnWifi, btnReorder, btnLibraryTop, btnSettings}) {
                 button.setOnFocusChangeListener((view, focused) -> view.animate()
                         .scaleX(focused ? 1.04f : 1f).scaleY(focused ? 1.04f : 1f)
                         .setDuration(reducedMotion ? Motion.REDUCED_MS : 160).start());
@@ -837,6 +862,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (showStats) startStats();
         sky.update();
         wallpaperPlayer.start();
+        if (onlineWallpaper != null) onlineWallpaper.start();
         handler.postDelayed(minuteTick, MINUTE_MS);
         if (festive && diya != null) {
             diya.start();
@@ -1006,6 +1032,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         root.removeCallbacks(showIdleClock);
         endReorder();   // Home or another app while reordering keeps the order so far
         wallpaperPlayer.stop();
+        if (onlineWallpaper != null) onlineWallpaper.stop();
         stopAmbientAnimation();
         hero.animate().cancel();
         ambient.animate().cancel();
@@ -1065,9 +1092,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     @Override
     protected void onDestroy() {
+        if (volumeHud != null) volumeHud.stop();
         super.onDestroy();
         unregisterReceiver(packageReceiver);
         wallpaperPlayer.close();
+        if (onlineWallpaper != null) onlineWallpaper.close();
         ConnectivityManager cm = getSystemService(ConnectivityManager.class);
         TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
         if (tim != null) tim.unregisterCallback(inputCallback);
@@ -2093,8 +2122,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         hideHero();
     }
 
-    /** The first top-bar button after Inputs that is shown: the network pill, Reorder, then Settings (always there). */
+    /** The first top-bar button that is shown: Recents, network, Reorder, then Settings (always there). */
     private View firstTopButton() {
+        if (btnRecents.getVisibility() == View.VISIBLE) return btnRecents;
         if (btnWifi.getVisibility() == View.VISIBLE) return btnWifi;
         if (btnReorder.getVisibility() == View.VISIBLE) return btnReorder;
         return findViewById(R.id.btnSettings);
@@ -2202,6 +2232,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private void updateClockVisibility() {
         boolean valid = System.currentTimeMillis() >= TIME_VALID_AFTER_MS;
         clockBlock.setVisibility(valid ? View.VISIBLE : View.INVISIBLE);
+        dateBlock.setVisibility(valid ? View.VISIBLE : View.INVISIBLE);
         handler.removeCallbacks(clockCheck);
         if (valid) {
             updateGreeting();
@@ -2882,6 +2913,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         View panel = getLayoutInflater().inflate(R.layout.popup_inputs, root, false);
         LinearLayout rows = panel.findViewById(R.id.rows);
         PopupWindow popup = glassPopup(panel, (int) (200 * density));
+        addSettingsMenuRow(rows, popup, R.string.recent_apps,
+                () -> startActivity(new Intent(this, RecentsActivity.class)));
         if (!launcherSettingsButton) addSettingsMenuRow(rows, popup, R.string.launcher_settings, () -> startActivityForResult(
                 new Intent(this, LauncherSettingsActivity.class), LAUNCHER_SETTINGS_REQUEST));
         if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);

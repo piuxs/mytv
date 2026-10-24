@@ -9,11 +9,23 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Personal fork only: the CozyPixels wallpaper shuffle streams one still image at a time into memory.
+         Nothing is written to the TV. Upstream's launcher deliberately has no INTERNET permission. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Needed since Android 10 to read the Wi-Fi network name for the network pill. Never requested at
          runtime: build-and-install grants it with pm grant, so lint's Android 12 "ask for COARSE with
          FINE" rule does not apply here. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
+    <!-- The Apple-style volume card is a TYPE_APPLICATION_OVERLAY window; build-and-install grants the
+         SYSTEM_ALERT_WINDOW app-op with adb (the TV has no touch UI for "Display over other apps"). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- RecentsActivity reads recent apps from UsageStatsManager. Granted with appops by build-and-install:
+         the TV's Settings has no usage-access screen for a sideloaded launcher. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Clear all / hold OK closes a recent app: kills its background processes, never uninstalls it. -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <!-- Puts the remote's accessibility helpers back after a force stop of this app took them off the enabled
          list (ServiceRepair). Granted with pm grant by build-and-install when a helper is enabled. -->
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
@@ -132,6 +144,14 @@
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay" />
+        <!-- Phone-style recent apps over Home: a dimmed row of app cards and a Clear all button. -->
+        <activity
+            android:name=".RecentsActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
         <!-- Home button for remotes that send KEYCODE_ALL_APPS (Xiaomi). Opt-in: HOME_KEY_SERVICE=1
              build-and-install.sh; see HomeKeyService. -->
         <service

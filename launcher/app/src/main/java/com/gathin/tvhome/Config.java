@@ -144,6 +144,8 @@ final class Config {
     final boolean restoreKeyServices;
     /** Whether themes may show a wallpaper (config.json, wallpaper). */
     final boolean wallpaperEnabled;
+    /** Personal fork: stream CozyPixels still wallpapers from the network, one in memory at a time (config.xml). */
+    final boolean onlineWallpapers;
     /** Full-screen picture behind the launcher, or null for the plain colour. */
     final File wallpaper;
     /** Rotating theme images, or the single wallpaper when no collection is configured. */
@@ -198,7 +200,7 @@ final class Config {
                    Festival festival, int[] inputKeycodes, List<String> appKeys, String stockHomeRedirect,
                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, int homeIdleClockMinutes,
                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
-                   boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding) {
+                   boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean onlineWallpapers) {
         this.handleViewInputs = handleViewInputs;
         this.tileMenu = tileMenu;
         this.inputKeycodes = inputKeycodes;
@@ -254,6 +256,7 @@ final class Config {
         this.settingsKeyPanel = settingsKeyPanel;
         this.restoreKeyServices = restoreKeyServices;
         this.wallpaperEnabled = wallpaperEnabled;
+        this.onlineWallpapers = onlineWallpapers;
         this.wallpaper = wallpaper;
         this.wallpapers = Collections.unmodifiableList(wallpapers);
         this.wallpaperRotationMinutes = wallpaperRotationMinutes;
@@ -323,6 +326,7 @@ final class Config {
         int wifiLabelWidth = res.getInteger(R.integer.wifi_label_width);
         boolean alwaysShowNames = res.getBoolean(R.bool.always_show_names);
         boolean wallpaperTrueColor = res.getBoolean(R.bool.wallpaper_true_color);
+        boolean onlineWallpapers = res.getBoolean(R.bool.online_wallpapers);
         boolean focusOvershoot = res.getBoolean(R.bool.focus_overshoot);
         boolean wallpaperCaptions = res.getBoolean(R.bool.wallpaper_captions);
         boolean tileMenu = res.getBoolean(R.bool.tile_menu);
@@ -393,6 +397,7 @@ final class Config {
             wifiLabelWidth = integer(json, "wifi_label_width", wifiLabelWidth, 0, 300);
             alwaysShowNames = bool(json, "always_show_names", alwaysShowNames);
             wallpaperTrueColor = bool(json, "wallpaper_true_color", wallpaperTrueColor);
+            onlineWallpapers = bool(json, "online_wallpapers", onlineWallpapers);
             focusOvershoot = bool(json, "focus_overshoot", focusOvershoot);
             wallpaperCaptions = bool(json, "wallpaper_captions", wallpaperCaptions);
             tileMenu = bool(json, "tile_menu", tileMenu);
@@ -470,7 +475,8 @@ final class Config {
                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
                 wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow,
-                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding);
+                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding,
+                onlineWallpapers);
     }
 
     /**

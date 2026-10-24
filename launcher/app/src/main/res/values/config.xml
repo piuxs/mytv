@@ -17,10 +17,11 @@
 
     <!-- Apps pinned to the dock row at the bottom, in this order. Missing apps are skipped. -->
     <string-array name="dock_apps">
-        <item>com.netflix.ninja</item>
-        <item>com.amazon.amazonvideo.livingroom</item>
         <item>com.google.android.youtube.tv</item>
-        <item>in.startv.hotstar</item>
+        <item>com.google.android.youtube.tvmusic</item>
+        <item>com.tcl.waterfall.overseas</item>
+        <item>com.android.vending</item>
+        <item>com.tcl.tv</item>
     </string-array>
     <!-- With fewer dock_apps than columns (or a dock app that is not installed), the free dock slots take
          the first grid apps, so the dock never shows a gap. false leaves them empty (#162); a theme can
@@ -34,7 +35,7 @@
     </string-array>
 
     <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->
-    <string name="live_tv_package" translatable="false">com.mediatek.wwtv.tvcenter</string>
+    <string name="live_tv_package" translatable="false">com.tcl.tv</string>
 
     <!-- Open the Live TV app above the first time Home comes up after the TV is switched on, for sets that are
          mostly used for broadcast TV. Once per boot: Home after that stays Home. Can also be set with
@@ -228,6 +229,9 @@
     <!-- Wallpapers decode as RGB_565 (2 bytes a pixel, 4 MB at 1080p), which bands dark gradients such as a night
          sky, most of all under wallpaper_dim. true decodes them in 32-bit colour: 8 MB, for TVs with 2 GB or more. -->
     <bool name="wallpaper_true_color">false</bool>
+    <!-- Online wallpaper shuffle (personal fork): stream one CozyPixels still wallpaper at a time into memory and
+         change it every five minutes. No wallpaper file is written to the TV. Needs INTERNET; off by default. -->
+    <bool name="online_wallpapers">true</bool>
     <!-- Rotating wallpapers: show each picture's name under the top-right buttons, from a captions.txt next to the
          pictures in wallpapers/ ("01-dusk.jpg<TAB>Dusk over the peaks", one per line). A picture without a line
          shows no name. Can also be set with "wallpaper_captions": true in a theme's config.json. -->
@@ -247,7 +251,7 @@
 
     <!-- Tiles per row in the grid; the dock always has this many slots. Tiles are 180dp wide at 4 columns and
          shrink to fit from 5 up (about 144dp at 5, 117dp at 6 on a 1080p TV). -->
-    <integer name="columns">4</integer>
+    <integer name="columns">5</integer>
 
     <!-- Basic motion is on; advanced effects are opt-in in the launcher's own Settings screen. -->
     <bool name="animations">true</bool>

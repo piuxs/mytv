@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Recent apps (RecentsActivity): a dimmed phone-style recents row over Home. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recentsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0A0B0E"
+    android:clickable="true"
+    android:focusable="false">
+
+    <TextView
+        android:id="@+id/recentsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="56dp"
+        android:fontFamily="@font/outfit_light"
+        android:letterSpacing="0.02"
+        android:text="@string/recent_apps"
+        android:textColor="#FFFFFFFF"
+        android:textSize="34sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recentsList"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:layout_gravity="center"
+        android:clipToPadding="false"
+        android:focusable="false"
+        android:overScrollMode="never"
+        android:paddingStart="72dp"
+        android:paddingEnd="72dp"
+        android:scrollbars="none" />
+
+    <LinearLayout
+        android:id="@+id/recentsEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/recentsEmptyIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_check_circle" />
+
+        <TextView
+            android:id="@+id/recentsEmptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/outfit_light"
+            android:text="@string/no_recent_apps"
+            android:textColor="#FFFFFFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/recentsUsageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/recents_button_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@string/font_medium"
+            android:gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/open_usage_access"
+            android:textColor="@color/recents_button_text"
+            android:textSize="15sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/btnClearAll"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:background="@drawable/recents_button_bg"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_delete"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/recents_button_text"
+            android:focusable="true"
+            android:fontFamily="@string/font_medium"
+            android:gravity="center"
+            android:paddingStart="26dp"
+            android:paddingEnd="28dp"
+            android:text="@string/clear_all"
+            android:textColor="@color/recents_button_text"
+            android:textSize="17sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/recentsHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/outfit_regular"
+            android:text="@string/recent_apps_hint"
+            android:textColor="#99FFFFFF"
+            android:textSize="15sp" />
+    </LinearLayout>
+</FrameLayout>

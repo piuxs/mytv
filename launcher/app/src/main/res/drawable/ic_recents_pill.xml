@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stacked rows: the Recents pill in the top bar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M4,5h16v2.6H4zM4,10.7h16v2.6H4zM4,16.4h16v2.6H4z" />
+</vector>

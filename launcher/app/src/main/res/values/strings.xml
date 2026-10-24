@@ -145,4 +145,16 @@
     <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
          last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
     <string name="last_opened">Last opened %1$s</string>
+
+    <!-- Recent-apps panel (RecentsActivity) and the Recents pill in the top bar. -->
+    <string name="recents">Recents</string>
+    <string name="recent_apps">Recent apps</string>
+    <string name="recent_apps_hint">OK opens · Hold OK closes one app · Clear all frees memory</string>
+    <string name="clear_all">Clear all</string>
+    <string name="no_recent_apps">No recent apps</string>
+    <string name="all_clear">All clear</string>
+    <string name="cleared_apps">Cleared %1$d apps</string>
+    <string name="closed_app">Closed %1$s</string>
+    <string name="usage_access_needed">Recent apps needs usage access</string>
+    <string name="open_usage_access">Open usage access</string>
 </resources>

@@ -202,7 +202,7 @@
                         android:format12Hour="h:mm"
                         android:format24Hour="HH:mm"
                         android:textColor="#FFFFFFFF"
-                        android:textSize="52sp"
+                        android:textSize="60sp"
                         android:fontFamily="@string/font_light"
                         android:letterSpacing="-0.04"
                         android:includeFontPadding="false" />
@@ -222,57 +222,52 @@
                         android:letterSpacing="0.08"
                         android:textAllCaps="true" />
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="#33FFFFFF" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="9dp"
-                        android:orientation="vertical">
-
-                        <!-- Shamsi date ("27 Mehr 1405"), shown when shamsi_date is on. -->
-                        <TextView
-                            android:id="@+id/shamsiDate"
-                            android:gravity="left"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:textColor="#E6FFFFFF"
-                            android:textSize="17sp"
-                            android:fontFamily="@string/font_regular"
-                            android:letterSpacing="0.02"
-                            android:includeFontPadding="false"
-                            android:visibility="gone" />
-
-                        <TextClock
-                            android:id="@+id/date"
-                            android:gravity="left"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:singleLine="@bool/date_single_line"
-                            android:maxLines="2"
-                            android:lineSpacingExtra="6dp"
-                            android:ellipsize="end"
-                            android:format12Hour="@string/date_format_home"
-                            android:format24Hour="@string/date_format_home"
-                            android:textColor="#A6FFFFFF"
-                            android:textSize="14sp"
-                            android:fontFamily="@string/font_regular"
-                            android:letterSpacing="0.14"
-                            android:textAllCaps="true" />
-                    </LinearLayout>
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <!-- The full weekday, day and month sit under the clock, outside leftBlock: the top buttons stay
+                 level with the clock row, and the date gets the full width instead of being squeezed between
+                 the clock and those buttons. -->
+            <LinearLayout
+                android:id="@+id/dateBlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/leftBlock"
+                android:layout_alignStart="@id/leftBlock"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical">
+
+                <!-- Shamsi date ("27 Mehr 1405"), shown when shamsi_date is on. -->
+                <TextView
+                    android:id="@+id/shamsiDate"
+                    android:gravity="left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="17sp"
+                    android:fontFamily="@string/font_regular"
+                    android:letterSpacing="0.02"
+                    android:includeFontPadding="false"
+                    android:visibility="gone" />
+
+                <TextClock
+                    android:id="@+id/date"
+                    android:gravity="left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="@bool/date_single_line"
+                    android:maxLines="2"
+                    android:lineSpacingExtra="6dp"
+                    android:format12Hour="@string/date_format_home"
+                    android:format24Hour="@string/date_format_home"
+                    android:textColor="#A6FFFFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="@string/font_regular"
+                    android:letterSpacing="0.14"
+                    android:textAllCaps="true" />
             </LinearLayout>
 
             <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
@@ -280,7 +275,7 @@
             <TextView
                 android:id="@+id/stats"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/leftBlock"
+                android:layout_below="@id/dateBlock"
                 android:layout_alignStart="@id/leftBlock"
                 android:gravity="left"
                 android:layout_height="wrap_content"
@@ -304,6 +299,13 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnRecents"
+                    style="@style/TopButton"
+                    android:text="@string/recents"
+                    android:drawableStart="@drawable/ic_recents_pill"
+                    android:nextFocusDown="@+id/grid" />
 
                 <TextView
                     android:id="@+id/btnInputs"
